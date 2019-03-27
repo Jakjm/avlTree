@@ -1,5 +1,4 @@
-package avl;
-
+package recursive;
 
 /**
  * AVL self-balancing binary tree class.
@@ -10,6 +9,9 @@ package avl;
 public class AVL <Contents extends Comparable<Contents>>{
 	/**The top of the tree*/
 	private BinaryNode <Contents> head; 
+	/**
+	 *Creates an instance of an AVL tree.
+	 */
 	public AVL(){
 	    this.head = null;
 	}
@@ -22,14 +24,14 @@ public class AVL <Contents extends Comparable<Contents>>{
 	return size(head);
 	}
 	/**
-	 * This method recursively determines the size of the tree.
-	 * @param subRoot
-	 * @return the size of the tree.
-	 */
-    private int size(BinaryNode<Contents> subRoot){
-     if(subRoot == null)return 0;
-     else return 1 + size(subRoot.getRight()) + size(subRoot.getLeft());
-    }
+	* This method recursively determines the size of the tree.
+	* @param subRoot
+	* @return the size of the tree.
+	*/
+	private int size(BinaryNode<Contents> subRoot){
+		if(subRoot == null)return 0;
+		else return 1 + size(subRoot.getRight()) + size(subRoot.getLeft());
+	}
 	/**
 	 * Returns the height of the root node.
 	 * You might want this to know how well the tree has been balanced, in comparison to its size.
@@ -499,7 +501,7 @@ public class AVL <Contents extends Comparable<Contents>>{
 		private static final long serialVersionUID = 1L;
 		public ItemNotInTreeException() 
 		{
-			super();
+			super("Item not contained within tree.");
 		}
 
 	}
@@ -508,7 +510,7 @@ public class AVL <Contents extends Comparable<Contents>>{
 	{
 		private static final long serialVersionUID = 1L;
 		public ItemInTreeException() {
-			super();
+			super("Item already contained within tree.");
 		}
 	}
 

@@ -1,5 +1,5 @@
-package avl;
-import java.util.ArrayList;
+package recursive;
+import java.util.LinkedList;
 
 /**
  * @author jakjm
@@ -8,10 +8,10 @@ public class CompetitionTest {
 	public static void main(String[] args)
 	{
 		AVL<Integer> tree = new AVL<Integer>();
-		ArrayList<Integer> list = new ArrayList<Integer>();
+		LinkedList<Integer> list = new LinkedList<Integer>();
 		long startTime = System.currentTimeMillis();
 		long endTime;
-		final int size = 100000;
+		final int size = 1000000;
 		boolean check = false;
 		
 		//For my AVL
@@ -35,7 +35,7 @@ public class CompetitionTest {
 		System.out.println("Removing " + size +  " took " + ((endTime-startTime)/1000.0) + "second(s)");
 		
 		//For the ArrayList
-		System.out.println("ArrayList");
+		System.out.println("LinkedList");
 		
 		//Adding time
 		for(int i = 0;i < size;i++)list.add(i);

@@ -1,4 +1,4 @@
-package avl;
+package recursive;
 /**
  * Testing here for the AVL's capacity to add random numbers without becoming imbalanced.
  * @author jakjm
