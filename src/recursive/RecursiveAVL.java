@@ -23,7 +23,6 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 	
 	/**
 	 *Adds an item to the recursive AVL Tree. 
-	 *
 	 *@param item - the item to be added to the tree. 
 	 *@return whether the item was sucessfully added to the tree.
 	 *If the item is already contained within the tree, it will <b>not</b> be added.
@@ -150,10 +149,10 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
     	}
 		//Else, if there's only one child, subRoot now points to that child.
     	else if(node.right == null){
-    		return node.left;
+    		node = node.left;
     	}
     	else if(node.left == null){
-    		return node.right;
+    		node = node.right;
     	}
 		/*
 		 * Otherwise, the node has two children. 
@@ -311,22 +310,7 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 		this.root = null;
 		this.size = 0;
 	}
-	/**
-	 * Returns whether the Recursive AVL Tree contains the item. 
-	 * @param obj - the item that could be contained within the tree. 
-	 * @return - whether the given object is contained within the tree or not. 
-	 */
-	@Override
-	public boolean contains(Object obj) {
-		//Casting the item. 
-		Item item;
-		try {
-			item = (Item)obj;
-		}
-		catch(ClassCastException e) {
-			return false;
-		}
-		
+	private boolean contains(Item item) {
 		//The node we're currently at in the tree.
 		AVLNode<Item> currentNode = root;
 		
@@ -348,6 +332,23 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 			}
 		}
 		return false;
+	}
+	/**
+	 * Returns whether the Recursive AVL Tree contains the item. 
+	 * @param obj - the item that could be contained within the tree. 
+	 * @return - whether the given object is contained within the tree or not. 
+	 */
+	@Override
+	public boolean contains(Object obj) {
+		//Casting the item. 
+		Item item;
+		try {
+			item = (Item)obj;
+		}
+		catch(ClassCastException e) {
+			return false;
+		}
+		return contains(item);
 	}
 
 	@Override
