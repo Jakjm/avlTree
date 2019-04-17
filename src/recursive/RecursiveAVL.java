@@ -23,17 +23,19 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 	
 	/**
 	 *Adds an item to the recursive AVL Tree. 
+	 *
 	 *@param item - the item to be added to the tree. 
 	 *@return whether the item was sucessfully added to the tree.
 	 *If the item is already contained within the tree, it will <b>not</b> be added.
 	 */
 	public boolean add(Item item) {
-		try {
+		if(contains(item)) {
+			return false;
+		}
+		else {
 			root = add(item, root);
 			++size;
 			return true;
-		} catch (ItemInTreeException e) {
-			return false; //If the item is already contained within the tree, return false. 
 		}
 	}
 	
@@ -48,7 +50,7 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
      * @return the new head of the subTree.
      * @throws ItemInTreeException if the node's object is the same as the object we're trying to add.
      */
-    private AVLNode<Item> add(Item object,AVLNode<Item> node) throws ItemInTreeException{
+    private AVLNode<Item> add(Item object,AVLNode<Item> node){
     	
     	//If we've reached a mystical space of nothingness, we create a binary node and return it.
     	if(node == null){
@@ -69,7 +71,7 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
     	}  
     	
     	//Else if the object is less than the node we're at, we add the object to the left of the node.
-    	else if(compareValue < 0){ 
+    	else {
     		node.left = add(object,node.left);
     		node.updateHeight();
     		
@@ -78,15 +80,11 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
     			node = rebalanceLeft(node); 
     		}
     	}
-    	//Otherwise, the node's object is the same as the object we're trying to add.
-    	//And so the object is already part of the tree - we have no business trying to add.
-    	//The other add method will return false since the object was already part of the tree.
-    	else{
-    		throw new ItemInTreeException();
-    	}
     	return node;
     }
-    
+    /**
+     * Removes the given object from the AVL tree if it is contained. 
+     */
     @Override
 	public boolean remove(Object obj) {
     	Item item;
@@ -96,14 +94,13 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 		catch(ClassCastException e) {
 			return false;
 		}
-		
-		try {
+		if(!contains(item)) {
+			return false;
+		}
+		else {
 			root = remove(item,root);
 			--size;
 			return true;
-		}
-		catch(Exception e) {
-			return false;
 		}
 	}
     /**
@@ -115,37 +112,30 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 	 * @return the new head of the node.
 	 * @throws ItemNotInTreeException - if the object you would like removed is not part of the tree in the first place.
 	 */
-	private AVLNode<Item> remove(Item object,AVLNode<Item> node) throws ItemNotInTreeException{
-        if(node == null)
-        {
-        	throw new ItemNotInTreeException();
-        }
+	private AVLNode<Item> remove(Item object,AVLNode<Item> node){
 		int compareValue = object.compareTo(node.item);
 		
 		//If we've found the item we're looking for, we delete the node.
 		//Then, we return the node that has taken it's place.
 		if(compareValue == 0){
 	    	node = delete(node);
-	    	node.updateHeight();
-	    	return node;
+	    	if(node != null)node.updateHeight();
 	    }
 		/*
 		 * If not we remove the object from the side the object is in.
 		 * Because we're removing from that side, we have to use a rebalance as if an object was added to the other side.
 		 */
-		
 	    else if(compareValue > 0){
 	    	node.right = remove(object, node.right);
 	    	node.updateHeight();
-	    	node = rebalanceLeft(node);
-	    	return node;
+	    	if(node.balanceFactor() < -1)node = rebalanceLeft(node);
 	    }
 	    else{
 	    	node.left = remove(object, node.left);
 	    	node.updateHeight();
-            node = rebalanceRight(node);
-	    	return node;
+            if(node.balanceFactor() > 1)node = rebalanceRight(node);
 	    }
+		return node;
 	}
 	/**
 	 * Deletes a node from the tree.
@@ -153,11 +143,10 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 	 * @return the node, now that it has been replaced or deleted.
 	 * @throws ItemNotInTreeException - please ignore this. It's impossible for the exception to be thrown here.
 	 */
-	private AVLNode<Item> delete(AVLNode<Item> node) throws ItemNotInTreeException{
+	private AVLNode<Item> delete(AVLNode<Item> node){
 		//If the node is a leaf, we can just delete since there are no subTrees.
 		if(node.left == null && node.right == null){
     		node = null;
-    		return node;
     	}
 		//Else, if there's only one child, subRoot now points to that child.
     	else if(node.right == null){
@@ -176,7 +165,7 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
     		Item object = node.right.farthestLeft().item;
     	    node.right = remove(object,node.right);
     	    node.item = object;
-    	    node = rebalanceLeft(node);
+    	    if(node.balanceFactor() < -1)node = rebalanceLeft(node);
     	}
 		return node;
 	}
@@ -291,6 +280,7 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
     	}
     	else{
          printTree(root);
+         System.out.println("");
     	}
     }
     /**
@@ -302,14 +292,13 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
        if(Math.abs(node.balanceFactor()) > 1) {
        	throw new RuntimeException("Tree not balanced");
        }
-		
-		String leftString="";
+       String leftString="";
        String rightString ="";
-    	if(node.left != null)leftString = node.left.item.toString();
-    	if(node.right != null)rightString = node.right.item.toString();
-    	System.out.println("Object: " + node.item + " Node height: " + node.height + " Balance factor: " + node.balanceFactor() + " left: " + leftString + " right : " + rightString);
-    	if(node.left != null)printTree(node.left);
-    	if(node.right != null)printTree(node.right);
+       if(node.left != null)leftString = node.left.item.toString();
+       if(node.right != null)rightString = node.right.item.toString();
+       System.out.println("Object: " + node.item + " Node height: " + node.height + " Balance factor: " + node.balanceFactor() + " left: " + leftString + " right : " + rightString);
+       if(node.left != null)printTree(node.left);
+       if(node.right != null)printTree(node.right);
     }
     
 	@Override
@@ -450,7 +439,6 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 	     }
 	     
 	     /**
-	  	 * JAVA is pass-by-reference-by-value so therefore setting a parameter equal to something won't change its real value.
 	  	 * @return the farthest node all the way down the left path
 	  	 */
 	  	private AVLNode<Item>farthestLeft(){
@@ -460,24 +448,14 @@ public class RecursiveAVL <Item extends Comparable<Item>> implements Set<Item>{
 	  		}
 	  		return leftMost;
 	  	}
+	  	/**
+	  	 * Updates the height of the current AVL node.
+	  	 */
 	  	public void updateHeight() {
 	  		int right = -1, left = -1;
 	  		if(this.right != null)right = this.right.height;
 	  		if(this.left != null)left = this.left.height;
 	  		this.height =  1 + Math.max(right,left);
 	  	}
-	}
-	
-	public static class ItemInTreeException extends RuntimeException
-	{
-		private static final long serialVersionUID = 1L;
-		public ItemInTreeException() {
-			super("Item already contained within tree.");
-		}
-	}
-	public static class ItemNotInTreeException extends RuntimeException{
-		public ItemNotInTreeException() {
-			super("Item not contained within tree.");
-		}
 	}
 }
